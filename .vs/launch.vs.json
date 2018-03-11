@@ -6,31 +6,11 @@
       "type": "python",
       "interpreter": "(default)",
       "interpreterArguments": "",
-      "scriptArguments": "",
+      "scriptArguments": "-s C:\\Users\\Chris\\Desktop\\IR\\stoplist -p C:\\Users\\Chris\\Desktop\\IR\\latimes",
       "nativeDebug": false,
       "webBrowserUrl": "",
-      "project": "Assignment-1\\Assignment-1.py",
-      "name": "Assignment-1.py"
-    },
-    {
-      "type": "python",
-      "interpreter": "(default)",
-      "interpreterArguments": "",
-      "scriptArguments": "",
-      "nativeDebug": false,
-      "webBrowserUrl": "",
-      "project": "Assignment-1\\Assignment-1.py",
-      "name": "Assignment-1.py(1)"
-    },
-    {
-      "type": "python",
-      "interpreter": "(default)",
-      "interpreterArguments": "",
-      "scriptArguments": "",
-      "nativeDebug": false,
-      "webBrowserUrl": "",
-      "project": "Assignment-1\\Assignment-1.py",
-      "name": "Assignment-1.py(2)"
+      "project": "Assignment-1\\index.py",
+      "name": "index.py"
     }
   ]
 }
