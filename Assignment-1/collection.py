@@ -9,10 +9,9 @@ class Document:
 
 
 class Collection:
-    def __init__(self, sourcefile):
-        self.documents = []
+    def __init__(self):
         self.stoplist = []
-        self.get_documents(sourcefile)
+        self.documents = []
 
     def get_documents(self, sourcefile):
         """
@@ -111,11 +110,22 @@ class Collection:
                     f.write(str(document.id) + ' ' + document.docno + '\n')
             f.close()
 
+    def map_to_inverted_index(self):
+        """
+        TODO: Stub
+        """
+        if self.documents:
+            for document in self.documents:
+                pass
+        pass
+
     def map_to_inverted_list(self):
         """
         TODO: Stub
         """
-        pass
+        if self.documents:
+            for document in self.documents:
+                pass
 
     def print_terms(self):
         """

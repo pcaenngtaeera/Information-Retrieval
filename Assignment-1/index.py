@@ -18,9 +18,10 @@ def main():
     parser.add_argument('-p', action='store_true')
     parser.add_argument('sourcefile', metavar='<sourcefile>', type=is_file)
     args = parser.parse_args()
-    collection = Collection(args.sourcefile)
+    collection = Collection()
     if args.s:
         collection.use_stoplist(args.s[0])
+    collection.get_documents(args.sourcefile)
     collection.map_to_disk()
     if args.p:
         collection.print_terms()
@@ -28,5 +29,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
