@@ -1,4 +1,9 @@
 import re
+from collections import Counter
+
+
+alphanumeric_pattern = re.compile('[\W_]+')
+no_tags_pattern = re.compile('<(.*?)>')
 
 
 class Document:
@@ -34,7 +39,6 @@ class Collection:
                     id += 1
                 else:
                     text += line
-        f.close()
 
     def get_terms(self, text):
         """
@@ -51,8 +55,8 @@ class Collection:
         Returns a list of terms that is filtered by the <stoplist> if it exists.
         """
         terms = []
-        for term in re.sub(r'<(.*?)>', '', text).split():
-            terms.append(re.sub(r'[\W_]+', '', term).lower())
+        for term in no_tags_pattern.sub('', text).split():
+            terms.append(alphanumeric_pattern.sub('', term).lower())
         if self.stoplist:
             return [t for t in terms if t not in self.stoplist]
         else:
@@ -73,15 +77,15 @@ class Collection:
         """
         lines = text.split('\n')
         docno = lines[0][8:-9]
-        n = 0
+        n, s, e = 0, 0, 0
         markers = []
         for line in lines:
             if line == '<HEADLINE>' or line == '<TEXT>':
-                markers.append([n, None])
+                s = n
             elif line == '</HEADLINE>' or line == '</TEXT>':
-                markers[-1][1] = n
+                e = n
+                markers.append((s, e))
             n += 1
-
         terms = []
         for marker in markers:
             terms += lines[marker[0]:marker[1]]
@@ -108,24 +112,31 @@ class Collection:
             with open('map', 'w+') as f:
                 for document in self.documents:
                     f.write(str(document.id) + ' ' + document.docno + '\n')
-            f.close()
 
-    def map_to_inverted_index(self):
+    def generate_inverted_index(self):
+
         """
         TODO: Stub
         """
+        postings = {}
         if self.documents:
             for document in self.documents:
-                pass
-        pass
+                for term in document.terms:
+                    if postings.has_key(term):
+                        postings[term].append(document.id)
+                    else:
+                        postings[term] = [document.id]
 
-    def map_to_inverted_list(self):
-        """
-        TODO: Stub
-        """
-        if self.documents:
-            for document in self.documents:
-                pass
+        offset = 0
+        with open('invlists', 'w+') as i, open('lexicon', 'w+') as l:
+            for term in postings.keys():
+                counter = Counter(postings[term])
+                l.write(term + ' ' + str(offset) + '\n')
+                i.write(str(len(counter.keys())))
+                for id in counter:
+                    i.write(' ' + str(id) + ' ' + str(counter[id]))
+                i.write('\n')
+                offset += 1
 
     def print_terms(self):
         """

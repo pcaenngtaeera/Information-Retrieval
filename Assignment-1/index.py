@@ -25,6 +25,7 @@ def main():
     collection.map_to_disk()
     if args.p:
         collection.print_terms()
+    collection.generate_inverted_index()
 
 
 if __name__ == "__main__":
