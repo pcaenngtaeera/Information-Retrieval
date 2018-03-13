@@ -11,6 +11,16 @@
       "webBrowserUrl": "",
       "project": "Assignment-1\\index.py",
       "name": "index.py"
+    },
+    {
+      "type": "python",
+      "interpreter": "(default)",
+      "interpreterArguments": "",
+      "scriptArguments": "",
+      "nativeDebug": false,
+      "webBrowserUrl": "",
+      "project": "Assignment-1\\index.py",
+      "name": "index.py(1)"
     }
   ]
 }

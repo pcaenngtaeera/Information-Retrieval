@@ -1,19 +1,43 @@
-import os
 import re
 
-class document():
+
+class Document:
     def __init__(self, id, docno, terms):
         self.id = id
         self.docno = docno
         self.terms = terms
 
-class document_parser():
+
+class Collection:
     def __init__(self, sourcefile):
-        self.sourcefile = sourcefile
         self.documents = []
         self.stoplist = []
+        self.get_documents(sourcefile)
 
-    def extract_terms(self, text):
+    def get_documents(self, sourcefile):
+        """
+        Uses invariants of <sourcefile> to efficient parse the file:
+            - <DOC> is the first line of <sourcefile>
+            - </DOC> is the last line of <sourcefile>
+            - Each </DOC> is followed by a </DOC> on the next line (excluding the final </DOC>)
+
+        Splits the sourcefile into a list of document strings using the invariants.
+        Increments an <id> to uniquely identify each document for mapping.
+        """
+        id = 0
+        text = ''
+        with open(sourcefile, 'r') as f:
+            for line in f:
+                if line == '<DOC>\n':
+                    text = ''
+                elif line == '</DOC>\n':
+                    self.documents.append(self.parse_document(id, text))
+                    id += 1
+                else:
+                    text += line
+        f.close()
+
+    def get_terms(self, text):
         """
         Splits a given string into a list of terms while using regex to remove tags (e.g. <TAG></TAG>)
 
@@ -31,7 +55,7 @@ class document_parser():
         for term in re.sub(r'<(.*?)>', '', text).split():
             terms.append(re.sub(r'[\W_]+', '', term).lower())
         if self.stoplist:
-            return [t for t in terms if t not in self.stoplist] 
+            return [t for t in terms if t not in self.stoplist]
         else:
             return terms
 
@@ -40,7 +64,7 @@ class document_parser():
         Uses invariants of <DOC></DOC> to efficiently parse documents:
             - <DOCNO></DOCNO> is the first line of the document
             - <HEADLINE> && </HEADLINE> appear individually on separate lines
-            - <TEXT></TEXT> appear individually on separate lines after <HEADLINE> && </HEADLINE>
+            - <TEXT></TEXT> appear individually on separate lines
 
         Given a string with the contents of the document, stores each line in a list of lines.
         Determines position of the relevant tags and uses slicing to obtain relevant data.
@@ -50,42 +74,32 @@ class document_parser():
         """
         lines = text.split('\n')
         docno = lines[0][8:-9]
-        n = 1
-        for line in lines[1:]:
-            if line == '<HEADLINE>':
-                headline_start = n
-            elif line == '</HEADLINE>':
-                headline_end = n
-            elif line == '<TEXT>':
-                text_start = n
-            elif line == '</TEXT>':
-                text_end = n
+        n = 0
+        markers = []
+        for line in lines:
+            if line == '<HEADLINE>' or line == '<TEXT>':
+                markers.append([n, None])
+            elif line == '</HEADLINE>' or line == '</TEXT>':
+                markers[-1][1] = n
             n += 1
-        headline_terms = self.extract_terms(' '.join(lines[headline_start:headline_end]))
-        text_terms = self.extract_terms(' '.join(lines[text_start:text_end]))
-        return document(id, docno, headline_terms + text_terms)
 
-    def extract_documents(self):
-        """
-        Uses invariants of <sourcefile> to efficient parse the file:
-            - <DOC> is the first line of <sourcefile>
-            - </DOC> is the last line of <sourcefile>
-            - Each </DOC> is followed by a </DOC> on the next line (excluding the final </DOC>)
+        terms = []
+        for marker in markers:
+            terms += lines[marker[0]:marker[1]]
+        terms = self.get_terms(' '.join(terms))
+        return Document(id, docno, terms)
 
-        Splits the sourcefile into a list of document strings using the invariants.
-        Increments an <id> to uniquely identify each document for mapping.
+    def use_stoplist(self, path):
         """
-        if self.sourcefile:
-            document_texts = self.sourcefile[6:-7].split("</DOC>\n<DOC>")
-            id = 0
-            for text in document_texts:
-                self.documents.append(self.parse_document(id, text))
-                id += 1
+        TODO: Comments
+        """
+        with open(path, 'r') as f:
+            self.stoplist = f.read().split('\n')
 
     def map_to_disk(self):
         """
         Writes a map of the <id> and <docno> of each document into the file <map> in the CWD.
-        
+
         Each line represents a document using the format:
             - <id> + whitespace + <docno>
 
@@ -97,16 +111,15 @@ class document_parser():
                     f.write(str(document.id) + ' ' + document.docno + '\n')
             f.close()
 
-    def apply_stoplist(self, path):
+    def map_to_inverted_list(self):
         """
-        TODO: Comments
+        TODO: Stub
         """
-        with open(path, 'r') as f:
-            self.stoplist = f.read().split('\n')
+        pass
 
     def print_terms(self):
         """
-        TODO: Comments [inorder print of terms]
+        TODO: Comments
         """
         if self.documents:
             for document in self.documents:
