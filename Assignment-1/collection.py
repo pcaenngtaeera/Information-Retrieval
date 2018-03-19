@@ -2,8 +2,8 @@ import re
 from collections import Counter
 
 
-alphanumeric_pattern = re.compile('[\W_]+')
-no_tags_pattern = re.compile('<(.*?)>')
+markup_pattern = re.compile('<(.*?)>')
+word_pattern = re.compile('[^a-zA-Z-/]')
 
 
 class Document:
@@ -15,7 +15,7 @@ class Document:
 
 class Collection:
     def __init__(self):
-        self.stoplist = []
+        self.stoplist = {}
         self.documents = []
 
     def get_documents(self, sourcefile):
@@ -55,8 +55,19 @@ class Collection:
         Returns a list of terms that is filtered by the <stoplist> if it exists.
         """
         terms = []
-        for term in no_tags_pattern.sub('', text).split():
-            terms.append(alphanumeric_pattern.sub('', term).lower())
+        words = markup_pattern.sub('', text).split()
+        for term in words:
+            word = word_pattern.sub('', term).lower()
+            if word.isalpha():
+                terms.append(word)
+            elif '-' in word: # hyphenated word
+                h_words = word.split('-')
+                for h_word in h_words:
+                    terms.append(h_word)
+            elif '/' in word: # slash word
+                s_words = word.split('/')
+                for s_word in s_words:
+                    terms.append(s_word)
         if self.stoplist:
             return [t for t in terms if t not in self.stoplist]
         else:
@@ -80,9 +91,9 @@ class Collection:
         n, s, e = 0, 0, 0
         markers = []
         for line in lines:
-            if line == '<HEADLINE>' or line == '<TEXT>':
+            if line == '<TEXT>' or line == '<HEADLINE>':
                 s = n
-            elif line == '</HEADLINE>' or line == '</TEXT>':
+            elif line == '</TEXT>' or line == '</HEADLINE>':
                 e = n
                 markers.append((s, e))
             n += 1
@@ -97,7 +108,7 @@ class Collection:
         TODO: Comments
         """
         with open(path, 'r') as f:
-            self.stoplist = f.read().split('\n')
+            self.stoplist = set(f.read().split('\n'))
 
     def map_to_disk(self):
         """
@@ -116,7 +127,7 @@ class Collection:
     def generate_inverted_index(self):
 
         """
-        TODO: Stub
+        TODO:
         """
         postings = {}
         if self.documents:
@@ -140,7 +151,7 @@ class Collection:
 
     def print_terms(self):
         """
-        TODO: Comments
+        TODO:
         """
         if self.documents:
             for document in self.documents:

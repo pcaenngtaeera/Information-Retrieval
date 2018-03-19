@@ -6,7 +6,7 @@
       "type": "python",
       "interpreter": "(default)",
       "interpreterArguments": "",
-      "scriptArguments": "-s C:\\Users\\Chris\\Desktop\\IR\\stoplist -p C:\\Users\\Chris\\Desktop\\IR\\latimes",
+      "scriptArguments": "-s C:\\Users\\Chris\\Desktop\\IR\\stoplist C:\\Users\\Chris\\Desktop\\IR\\latimes",
       "nativeDebug": false,
       "webBrowserUrl": "",
       "project": "Assignment-1\\index.py",
@@ -21,6 +21,11 @@
       "webBrowserUrl": "",
       "project": "Assignment-1\\index.py",
       "name": "index.py(1)"
+    },
+    {
+      "type": "pyproj",
+      "project": "Assignment-1\\Assignment-1.pyproj",
+      "name": "Assignment-1.pyproj"
     }
   ]
 }

@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import timeit
 from collection import Collection
 
 
@@ -18,6 +19,11 @@ def main():
     parser.add_argument('-p', action='store_true')
     parser.add_argument('sourcefile', metavar='<sourcefile>', type=is_file)
     args = parser.parse_args()
+
+    ###
+    #start = timeit.default_timer()
+    ###
+
     collection = Collection()
     if args.s:
         collection.use_stoplist(args.s[0])
@@ -26,6 +32,10 @@ def main():
     if args.p:
         collection.print_terms()
     collection.generate_inverted_index()
+
+    ###
+    #print(timeit.default_timer() - start)
+    ###
 
 
 if __name__ == "__main__":
