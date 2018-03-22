@@ -23,13 +23,25 @@ def main():
     parser.add_argument('queries', metavar='<queryterm>', nargs='+')
     args = parser.parse_args()
 
-    with open('map', 'r') as m, open('lexicon', 'r') as l:
+    with open(args.map, 'r') as m, open(args.lexicon, 'r') as l:
         for line in m:
             (id, docno) = line.split()
-            map[int(id)] = docno
+            map[id] = docno
         for line in l:
             (term, pointer) = line.split()
             lexicon[term] = pointer
+
+    with open(args.invlists) as i:
+        for query in args.queries:
+            byte_offset = int(lexicon[query])
+            i.seek(byte_offset)
+            inverted_list = i.next().rstrip().split()
+            print(query)
+            print(inverted_list[0])
+            inverted_list_iterator = iter(inverted_list[1:])
+            for item in inverted_list_iterator:
+                print(map[item] + ' '+ inverted_list_iterator.next() + '\n')
+
 
 
 if __name__ == "__main__":
