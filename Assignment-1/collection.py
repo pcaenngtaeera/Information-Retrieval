@@ -138,16 +138,15 @@ class Collection:
                     else:
                         postings[term] = [document.id]
 
-        offset = 0
         with open('invlists', 'w+') as i, open('lexicon', 'w+') as l:
             for term in postings.keys():
+                byte_offset = i.tell()
                 counter = Counter(postings[term])
-                l.write(term + ' ' + str(offset) + '\n')
+                l.write(term + ' ' + str(byte_offset) + '\n')
                 i.write(str(len(counter.keys())))
                 for id in counter:
                     i.write(' ' + str(id) + ' ' + str(counter[id]))
                 i.write('\n')
-                offset += 1
 
     def print_terms(self):
         """
