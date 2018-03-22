@@ -33,15 +33,17 @@ def main():
 
     with open(args.invlists) as i:
         for query in args.queries:
-            byte_offset = int(lexicon[query])
-            i.seek(byte_offset)
-            inverted_list = i.next().rstrip().split()
-            print(query)
-            print(inverted_list[0])
-            inverted_list_iterator = iter(inverted_list[1:])
-            for item in inverted_list_iterator:
-                print(map[item] + ' '+ inverted_list_iterator.next() + '\n')
-
+            if query in lexicon:
+                byte_offset = int(lexicon[query])
+                i.seek(byte_offset)
+                inverted_list = i.next().rstrip().split()
+                print(query)
+                print(inverted_list[0])
+                inverted_list_iterator = iter(inverted_list[1:])
+                for item in inverted_list_iterator:
+                    print(map[item] + ' '+ inverted_list_iterator.next() + '\n')
+            else:
+                print("No results found for query: " + '\'' + query + '\'')
 
 
 if __name__ == "__main__":
