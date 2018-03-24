@@ -2,10 +2,7 @@
 
 import argparse
 import os
-
-
-map = {}
-lexicon = {}
+import sys
 
 
 def is_file(path):
@@ -23,17 +20,33 @@ def main():
     parser.add_argument('queries', metavar='<queryterm>', nargs='+')
     args = parser.parse_args()
 
-    with open(args.map, 'r') as m, open(args.lexicon, 'r') as l:
-        for line in m:
-            (id, docno) = line.split()
-            map[id] = docno
-        for line in l:
-            (term, pointer) = line.split()
-            lexicon[term] = pointer
+    map = {}
+    lexicon = {}
+
+    with open(args.map, 'r') as map_file, open(args.lexicon, 'r') as lexicon_file:
+        try:
+            for line in map_file:
+                (id, docno) = line.split()
+                map[id] = docno
+        except ValueError:
+            print("Unable to parse <map> due to format error(s):")
+            print("e.g. <id> <docno> -> 11 LA010189-0012")
+            print("ERROR_LINE: " + line)
+            sys.exit()
+
+        try:
+            for line in lexicon_file:
+                (term, pointer) = line.split()
+                lexicon[term] = pointer
+        except ValueError:
+            print("Unable to parse <lexicon> due to format error(s):")
+            print("e.g. <term> <pointer> -> electricity 113")
+            print("ERROR_LINE: " + line)
+            sys.exit()
 
     with open(args.invlists) as i:
-        for query in args.queries:
-            if query in lexicon:
+        try:
+            for query in args.queries:
                 byte_offset = int(lexicon[query])
                 i.seek(byte_offset)
                 inverted_list = i.next().rstrip().split()
@@ -42,8 +55,9 @@ def main():
                 inverted_list_iterator = iter(inverted_list[1:])
                 for item in inverted_list_iterator:
                     print(map[item] + ' '+ inverted_list_iterator.next() + '\n')
-            else:
-                print("No results found for query: " + '\'' + query + '\'')
+        except KeyError:
+            print("No documents contain the query " + '<' + query + '>')
+            sys.exit()
 
 
 if __name__ == "__main__":
