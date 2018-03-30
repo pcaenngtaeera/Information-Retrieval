@@ -2,8 +2,9 @@
 
 import argparse
 import os
-import timeit
+import time
 from collection import Collection
+from postings import Postings
 
 
 def is_file(path):
@@ -14,28 +15,26 @@ def is_file(path):
 
 
 def main():
+
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('-s', metavar='\b <stopfile>', nargs=1, type=is_file)
     parser.add_argument('-p', action='store_true')
     parser.add_argument('sourcefile', metavar='<sourcefile>', type=is_file)
     args = parser.parse_args()
 
-    ###
-    #start = timeit.default_timer()
-    ###
+    start = time.time()
 
     collection = Collection()
     if args.s:
         collection.use_stoplist(args.s[0])
     collection.get_documents(args.sourcefile)
     collection.map_to_disk()
+    postings = Postings(collection)
+    postings.generate_inverted_index()
     if args.p:
         collection.print_terms()
-    collection.generate_inverted_index()
 
-    ###
-    #print(timeit.default_timer() - start)
-    ###
+    print(time.time() - start)
 
 
 if __name__ == "__main__":

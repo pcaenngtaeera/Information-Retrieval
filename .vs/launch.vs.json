@@ -6,7 +6,7 @@
       "type": "python",
       "interpreter": "(default)",
       "interpreterArguments": "",
-      "scriptArguments": "-s C:\\Users\\Chris\\Desktop\\IR\\stoplist C:\\Users\\Chris\\Desktop\\IR\\latimes",
+      "scriptArguments": "-s C:\\Users\\Chris\\Desktop\\IR\\stoplist -p C:\\Users\\Chris\\Desktop\\IR\\latimes",
       "nativeDebug": false,
       "webBrowserUrl": "",
       "project": "Assignment-1\\index.py",
@@ -16,11 +16,11 @@
       "type": "python",
       "interpreter": "(default)",
       "interpreterArguments": "",
-      "scriptArguments": "",
+      "scriptArguments": "lexicon invlists map aided",
       "nativeDebug": false,
       "webBrowserUrl": "",
-      "project": "Assignment-1\\index.py",
-      "name": "index.py(1)"
+      "project": "Assignment-1\\search.py",
+      "name": "search.py"
     },
     {
       "type": "pyproj",
