@@ -1,27 +1,16 @@
 #!/usr/bin/env python
 
 import argparse
-import os
 import struct
-import time
-
-
-def is_file(path):
-    if os.path.isfile(path):
-        return path
-    else:
-        raise argparse.ArgumentTypeError("unable to load file at " + path)
 
 
 def main():
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument('lexicon', metavar='<lexicon>', type=is_file)
-    parser.add_argument('invlists', metavar='<invlists>', type=is_file)
-    parser.add_argument('map', metavar='<map>', type=is_file)
+    parser.add_argument('lexicon', metavar='<lexicon>')
+    parser.add_argument('invlists', metavar='<invlists>')
+    parser.add_argument('map', metavar='<map>')
     parser.add_argument('queries', metavar='<queryterm>', nargs='+')
     args = parser.parse_args()
-
-    start = time.time()
 
     map = {}
     lexicon = {}
@@ -46,8 +35,6 @@ def main():
                         docno = map[struct.unpack('I', invlists_file.read(4))[0]]
                         count = str(struct.unpack('I', invlists_file.read(4))[0])
                         print(docno + ' ' + count)
-
-    print(time.time() - start)
 
 
 if __name__ == "__main__":
