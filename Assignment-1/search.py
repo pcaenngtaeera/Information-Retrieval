@@ -58,7 +58,7 @@ def main():
             if term in term_lexicon:
                 print(term)
                 byte_offset = int(term_lexicon[term])
-                invlists_file.seek(byte_offset) # sets the file's current position to the offset
+                invlists_file.seek(byte_offset)  # sets the file's current position to the offset
                 document_frequency = struct.unpack('I', invlists_file.read(4))[0]
                 print(document_frequency)
                 for _ in itertools.repeat(None, document_frequency):
