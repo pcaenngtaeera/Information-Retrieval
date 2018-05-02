@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Assignment-1/map
+/Assignment-1/lexicon
+/Assignment-1/invlists
