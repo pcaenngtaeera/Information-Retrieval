@@ -5,21 +5,17 @@ from math import log
 
 class BM25:
 
-    def __init__(self, n, al, k=1.2, b=0.75):
+    def __init__(self, k=1.2, b=0.75):
         """
-        An algorithm that ranks documents in order of relevance to a given query.
+        An algorithm that ranks documents in order of relevance from a query.
 
-        :param n: the number of documents in the collection
-        :param al: the average length of documents in the collection
         :param k: a scoring constant, the default value is 1.2
         :param b: a scoring constant, the default value is 0.75
         """
-        self.n = n
-        self.al = al
         self.k = k
         self.b = b
 
-    def weight(self, l):
+    def weight(self, l, al):
         """
         Computes the value of 'K' in the BM25 score function.
 
@@ -28,19 +24,19 @@ class BM25:
         Thus, it is the document weighting function.
 
         :param l: the document length measured in bytes
+        :param al: the average document length measured in bytes
         :return:
         """
-        return self.k * ((1 - self.b) + ((self.b * l) / self.al))
+        return self.k * ((1 - self.b) + ((self.b * l) / al))
 
-    def score(self, q, d):
+    def score(self, n, f, d, w):
         """
-        Computes the BM25 score for a document given a query.
+        Computes the BM25 score for a single document given a term.
 
-        :param q: the query comprising of a list of terms
-        :param d: the document
+        :param n: the number of documents in the collection
+        :param f: the number of documents containing the term
+        :param d: the within-document frequency
+        :param w: the document weight
         :return:
         """
-        score = 0
-        for t in q:
-            score += log((self.n - d.f + 0.5) / (d.f + 0.5)) * (((self.k + 1) * d.o) / (d.w * d.o))
-        return score
+        return log((n - f + 0.5) / (f + 0.5)) * (((self.k + 1) * d) / (w + d))

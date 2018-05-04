@@ -111,13 +111,11 @@ class Collection:
         The <map> file is line-separated, where each line consists of '<id> <docno> <document_weight>'.
         The <document_weight> is calculated as the value of K in BM25's scoring function.
         """
-        N = len(self.documents)
-        AL = sum(map(lambda d: d.length, self.documents)) / N
-        print(AL)
-        ranker = BM25(N, AL)
+        al = sum(map(lambda d: d.length, self.documents)) / len(self.documents)
+        ranker = BM25()
         with open('map', 'w') as f:
             for document in self.documents:
-                f.write(str(document.id) + ' ' + document.docno + ' ' + str(ranker.weight(document.length)) + '\n')
+                f.write(str(document.id) + ' ' + document.docno + ' ' + str(ranker.weight(document.length, al)) + '\n')
 
     def create_postings(self):
         """
@@ -149,7 +147,7 @@ class Collection:
         with open('invlists', 'wb') as invlists_file, open('lexicon', 'w') as lexicon_file:
             for term in postings.keys():
                 lexicon_file.write(term + ' ' + str(invlists_file.tell()) + '\n')  # gets the position of the file
-                term_occurrences = Counter(postings[term])  # tallies term occurences by document <id>
+                term_occurrences = Counter(postings[term])  # tallies term occurrences by document <id>
                 document_frequency = len(term_occurrences.keys())
                 invlists_file.write(str(pack('I', document_frequency)))
                 for document_id in term_occurrences.keys():
