@@ -38,8 +38,8 @@ def main():
             term, byte_offset = line.split()
             lexicon[term] = byte_offset
 
-    N = len(map)
-    ranker = BM25()
+    N = len(map)  # number of documents in the collection
+    ranker = BM25()  # BM25 instance with default constants
     with open(args.i, 'rb') as invlists_file:
         for term in args.query:  # one term at a time
             if term in lexicon:  # term needs to exist in lexicon
@@ -74,7 +74,7 @@ def main():
         print("%s %s %d %.3f" % (query_label, top_tuple[1], rank, top_tuple[0]))
         rank += 1
 
-    print("Running time: %f ms" % ((time() - start_time) * 1000))
+    print("\nRunning time: %d ms" % ((time() - start_time) * 1000))
 
 if __name__ == "__main__":
     main()
