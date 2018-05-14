@@ -15,13 +15,13 @@ class BM25:
         self.k = k
         self.b = b
 
-    def weight(self, l, al):
+    def document_weight(self, l, al):
         """
         Computes the value of 'K' in the BM25 score function.
 
         The function is dependant on the length of a document
         and the average length of documents within the collection.
-        Thus, it is the document weighting function.
+        Thus, it is independant from the statistics of a term.
 
         :param l: the document length measured in bytes
         :param al: the average document length measured in bytes
@@ -29,14 +29,37 @@ class BM25:
         """
         return self.k * ((1 - self.b) + ((self.b * l) / al))
 
-    def score(self, n, f, d, w):
+    def score(self, N, f_t, d, w):
         """
         Computes the BM25 score for a single document given a term.
 
-        :param n: the number of documents in the collection
-        :param f: the number of documents containing the term
+        By default the equation uses the inverse document frequency (IDF)
+        to calculate the weight for a term.
+
+        :param N: the number of documents in the collection
+        :param f_t: the number of documents containing the term
         :param d: the within-document frequency
         :param w: the document weight
+        :param m: optional multiplier used in query expansion
         :return:
         """
-        return log((n - f + 0.5) / (f + 0.5)) * (((self.k + 1) * d) / (w + d))
+        return log((N - f_t + 0.5) / (f_t + 0.5)) * (((self.k + 1) * d) / (w + d))
+
+    def score_aqe(self, s, d, w):
+        """
+        Computes the BM25 score for a single document given a term.
+
+        By default the equation uses the inverse document frequency (IDF)
+        to calculate the weight for a term.
+
+        :param N: the number of documents in the collection
+        :param f_t: the number of documents containing the term
+        :param d: the within-document frequency
+        :param w: the document weight
+        :param m: optional multiplier used in query expansion
+        :return:
+        """
+        return s * (((self.k + 1) * d) / (w + d))
+
+    def idf_term_weight(self):
+        return

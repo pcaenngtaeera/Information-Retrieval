@@ -5,6 +5,35 @@ from ranking import BM25
 from re import compile, split
 from struct import pack
 
+term_regex = compile('[^a-zA-Z-/\']')
+
+def tokenize(content, stoplist=None):
+    """
+    Converts a list of words into terms based on a set of rules/
+
+    We decided to keep words containing either hyphens, forward-slashes or apostrophes
+    in our earlier regex because they themselves are composed of multiple words.
+    We now use another another regex that matches word groups to extract the words.
+
+    The reasoning behind these decisions is to maintain the structure of the words.
+    This is so the index reflects what a typical user expects. For example in a search
+    function where the user wants to find occurrences of "campus", it is preferable to
+    recognize "on-campus" as a legitimate source of "campus".
+
+    :param content: a string of text
+    :return terms: a list of words after tokenization
+    """
+    words = term_regex.sub(' ', content).lower().split()
+    terms = []
+    for word in words:
+        if word.isalpha():
+            terms.append(word)
+        else:
+            terms.extend(split('\W+', word))
+    if stoplist:
+        terms = [t for t in terms if t not in stoplist]
+    return terms
+
 
 class Document:
 
@@ -29,7 +58,7 @@ class Document:
 
 class Collection:
 
-    def __init__(self, sourcefile, stoplist=None):
+    def __init__(self, stoplist=None):
         """
         Contains functions to index a collection.
 
@@ -41,35 +70,30 @@ class Collection:
             with open(stoplist, 'r') as f:
                 self.stoplist = set(f.read().split('\n'))
         self.documents = []
-        self.parse_collection(sourcefile)
 
-    def tokenize_terms(self, words):
-        """
-        Converts a list of words into terms based on a set of rules/
+    def parse_document(self, collection, docno):
+        with open(collection, 'r') as f:
+            content = ''
+            appending = False
+            found = False
+            for line in f:
+                if not found:
+                    if line.startswith('<DOCNO>') and docno == line[8:-10]:
+                        found = True
+                else:
+                    if line == '<TEXT>\n' or line == '<HEADLINE>\n':
+                        appending = True
+                    elif line == '</TEXT>\n' or line == '</HEADLINE>\n':
+                        appending = False
+                    elif appending and not line.startswith(('<', '</')):
+                        content += line
+                    elif line == '</DOC>\n':
+                        terms = tokenize(content, self.stoplist)
+                        self.documents.append(Document(len(self.documents), docno, terms))
+                        return True
+            return False
 
-        We decided to keep words containing either hyphens, forward-slashes or apostrophes
-        in our earlier regex because they themselves are composed of multiple words.
-        We now use another another regex that matches word groups to extract the words.
-
-        The reasoning behind these decisions is to maintain the structure of the words.
-        This is so the index reflects what a typical user expects. For example in a search
-        function where the user wants to find occurrences of "campus", it is preferable to
-        recognize "on-campus" as a legitimate source of "campus".
-
-        :param words: a list of words before tokenization
-        :return terms: a list of words after tokenization
-        """
-        terms = []
-        for word in words:
-            if word.isalpha():
-                terms.append(word)
-            else:
-                terms.extend(split('\W+', word))
-        if self.stoplist:
-            terms = [t for t in terms if t not in self.stoplist]
-        return terms
-
-    def parse_collection(self, sourcefile):
+    def parse_collection(self, collection):
         """
         Iterates the <collection> one line at time to store important data.
 
@@ -80,14 +104,13 @@ class Collection:
         > resets <content> if line equals "<DOC>"
         > tokenizes <content> if line equals "</DOC>" and increments <id>
 
-        :param sourcefile: a path to a <collection>
+        :param collection: a path to a <collection>
         """
-        with open(sourcefile, 'r') as f:
+        with open(collection, 'r') as f:
             id = 0
             docno = ''
             content = ''
             appending = False
-            term_regex = compile('[^a-zA-Z-/\']')
             for line in f:
                 if line == '<TEXT>\n' or line == '<HEADLINE>\n':
                     appending = True
@@ -101,7 +124,7 @@ class Collection:
                     content = ''
                 elif line == '</DOC>\n':
                     id += 1
-                    terms = self.tokenize_terms(term_regex.sub(' ', content).lower().split())
+                    terms = self.tokenize_terms(content, self.stoplist)
                     self.documents.append(Document(id, docno, terms))
 
     def write_map_to_disk(self):
@@ -115,7 +138,7 @@ class Collection:
         ranker = BM25()
         with open('map', 'w') as f:
             for document in self.documents:
-                f.write(str(document.id) + ' ' + document.docno + ' ' + str(ranker.weight(document.length, al)) + '\n')
+                f.write(str(document.id) + ' ' + document.docno + ' ' + str(ranker.document_weight(document.length, al)) + '\n')
 
     def create_postings(self):
         """

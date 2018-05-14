@@ -16,7 +16,8 @@ def main():
     parser.add_argument('sourcefile', metavar='<sourcefile>')
     args = parser.parse_args()
 
-    collection = Collection(args.sourcefile, args.s[0]) if args.s else Collection(args.sourcefile)
+    collection = Collection(args.s[0]) if args.s else Collection()
+    collection.parse_collection(args.sourcefile)
     collection.write_map_to_disk()
     collection.write_invlists_lexicon_to_disk()
 
