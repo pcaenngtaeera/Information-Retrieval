@@ -20,7 +20,7 @@ def main():
 
     collection = Collection(args.sourcefile, args.s[0]) if args.s else Collection(args.sourcefile)
     collection.write_map_to_disk()
-    collection.write_invlists_lexicon_to_disk()
+    collection.write_compressed_invlists_lexicon_to_disk()
     if args.p:
         collection.print_terms()
 

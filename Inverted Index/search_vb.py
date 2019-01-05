@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from argparse import ArgumentParser
-from struct import unpack
+from compression import decode
 
 
 def main():
@@ -50,11 +50,11 @@ def main():
                 print(term)
                 byte_offset = int(term_lexicon[term])
                 invlists_file.seek(byte_offset)
-                document_frequency = unpack('I', invlists_file.read(4))[0]
+                document_frequency = decode(invlists_file)
                 print(document_frequency)
                 for _ in range(document_frequency):
-                    docno = document_map[str(unpack('I', invlists_file.read(4))[0])]
-                    within_document_frequency = str(unpack('I', invlists_file.read(4))[0])
+                    docno = document_map[str(decode(invlists_file))]
+                    within_document_frequency = str(decode(invlists_file))
                     print(docno + ' ' + within_document_frequency)
 
 
