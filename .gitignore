@@ -1,7 +1,7 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
-/Assignment-1/map
-/Assignment-1/lexicon
-/Assignment-1/invlists
+﻿/Inverted Index/map
+/Inverted Index/lexicon
+/Inverted Index/invlists
+/Automatic Query Expansion/map
+/Automatic Query Expansion/lexicon
+/Automatic Query Expansion/invlists
+/Automatic Query Expansion/qrels
